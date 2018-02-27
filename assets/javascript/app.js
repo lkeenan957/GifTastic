@@ -1,4 +1,4 @@
-var topics = ["monkey", "donkey", "cat", "dog", "lion"];
+var topics = ["star wars", "breakfast at tiffanys", "elf", "the princess bride"];
 
 
 function topicsDisplay(arr){
@@ -6,7 +6,8 @@ function topicsDisplay(arr){
     var btn = $("<button>");
     btn.attr("id", "topicBtn");
     btn.attr("type", "button")
-    btn.html("name", arr[i]);
+    btn.attr("name", arr[i]);
+    btn.html(arr[i]);
     $("#buttonsDiv").append(btn);
     console.log(arr[i])
   }
@@ -26,13 +27,19 @@ function getGiphy(search){
     url: queryURL,
     method: "GET"
   }).done(function(response) {
+    console.log(response)
     for(i = 0; i < limit; i++){
-      rating = response.data[i].rating.toUpperCase();
-      image = response.data[i].embeded_url;
-      $(".GIFdiv").append("<p>Rating: "+rating)
+      var rating = response.data[i].rating.toUpperCase();
+      var image = response.data[i].images.fixed_height_still.url;
+      var animate = response.data[i].images.fixed_height.url;
+      $(".GIFdiv").append("<p>Rating: "+ rating)
       var img = $("<img>");
       img.attr("id", "imageDisplay");
-      img.attr("value", "<a href=" + image +"></a>")
+      img.attr("src", image)
+      img.attr("data-state", "still")
+      img.attr("data-still", image)
+      img.attr("data-animate", animate)
+
       $(".GIFdiv").append(img);
     }
   });
@@ -51,18 +58,36 @@ $( document ).ready(function() {
     var btn = $("<button>");
     btn.attr("id", "topicBtn");
     btn.attr("type", "button")
-    btn.html("name", newValue);
+    btn.html(newValue);
     $("#buttonsDiv").append(btn);
     console.log(newValue);
 
-    getGiphy(newValue);
+    // getGiphy(newValue);
   })
 
-  $("#topicBtn").on("click", function(){
+  $("#buttonsDiv").on("click", "#topicBtn", function(){
     event.preventDefault();
-    var m = $("#topicBtn").val().trim()
+    console.log($(this).text())
+    var m = $(this).text().trim()
+    console.log(m, "this is m");
 
     getGiphy(m);
   })
+  $(".GIFdiv").on("click", "#imageDisplay", function(){
+        console.log($(this).attr("data-state"))
+        var state = $(this).attr("data-state")
+        //if our data-stat == still
+          //animate the gif
+        //if its not still it must be animiated
+          //stop the animation
+        if (state === "still") {
+          $(this).attr("src", $(this).attr("data-animate"));
+          $(this).attr("data-state", "animated")
+        }else{
+          $(this).attr("src", $(this).attr("data-still"));
+          $(this).attr("data-state", "still")
+        }
+  })
+
 
 });
